@@ -1,1 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hokage Infinity Engine Alpha 1</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header id="topBar">
+
+    <div class="titleArea">
+        <h1>🌎 Hokage Infinity World</h1>
+        <p>Engine Alpha 1</p>
+    </div>
+
+    <div class="worldStats">
+
+        <div class="stat">
+            <span>Year</span>
+            <strong id="year">1</strong>
+        </div>
+
+        <div class="stat">
+            <span>Season</span>
+            <strong id="season">Spring</strong>
+        </div>
+
+        <div class="stat">
+            <span>Day</span>
+            <strong id="day">1</strong>
+        </div>
+
+        <div class="stat">
+            <span>Time</span>
+            <strong id="time">08:00</strong>
+        </div>
+
+        <div class="stat">
+            <span>Population</span>
+            <strong id="population">0</strong>
+        </div>
+
+    </div>
+
+</header>
+
+<main id="gameLayout">
+
+    <!-- LEFT PANEL -->
+
+    <aside id="leftPanel">
+
+        <section class="panel">
+
+            <h2>👥 Citizens</h2>
+
+            <input
+                id="citizenSearch"
+                type="text"
+                placeholder="Search citizens..."
+            >
+
+            <div id="citizensList"></div>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>🌍 God Prompt</h2>
+
+            <textarea
+                id="worldPrompt"
+                rows="5"
+                placeholder="Example:
+A mysterious traveler arrives from the north..."
+            ></textarea>
+
+            <button id="applyPromptBtn">
+                Influence World
+            </button>
+
+        </section>
+
+    </aside>
+
+    <!-- CENTER -->
+
+    <section id="worldSection">
+
+        <canvas
+            id="worldCanvas"
+            width="900"
+            height="900">
+        </canvas>
+
+    </section>
+
+    <!-- RIGHT PANEL -->
+
+    <aside id="rightPanel">
+
+        <section class="panel">
+
+            <h2>👤 Citizen Profile</h2>
+
+            <div id="citizenProfile">
+
+                Select a citizen...
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <h2>📜 Story Feed</h2>
+
+            <div id="storyFeed"></div>
+
+        </section>
+
+    </aside>
+
+</main>
+
+<footer>
+
+    <button id="saveBtn">
+        💾 Save
+    </button>
+
+    <button id="loadBtn">
+        📂 Load
+    </button>
+
+    <button id="resetBtn">
+        🔄 Reset
+    </button>
+
+</footer>
+
+<!-- DATA -->
+
+<script src="data/names.js"></script>
+<script src="data/jobs.js"></script>
+<script src="data/traits.js"></script>
+
+<!-- ENGINE -->
+
+<script src="js/world.js"></script>
+<script src="js/citizens.js"></script>
+<script src="js/emotions.js"></script>
+<script src="js/relationships.js"></script>
+<script src="js/conversations.js"></script>
+<script src="js/story.js"></script>
+<script src="js/promptEngine.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/save.js"></script>
+
+<!-- START ENGINE -->
+
+<script src="js/app.js"></script>
+
+</body>
+
+</html>
