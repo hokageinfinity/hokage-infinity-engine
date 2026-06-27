@@ -1,51 +1,32 @@
 /* ==========================================================
-   Hokage Infinity Engine
+   Hokage Infinity World
    renderer.js
-   Engine Alpha 1.1
+   Integrated Engine Version 1.0
 ========================================================== */
 
 "use strict";
 
 /* ==========================================================
-    RENDERER
+    RENDER ENGINE
 ========================================================== */
 
-const Renderer = {
+const Renderer={
 
-    canvas: null,
-    ctx: null,
+    canvas:null,
 
-    tileSize: 24,
+    ctx:null,
 
-    camera: {
+    tileSize:20,
 
-        x: 0,
-        y: 0,
+    width:100,
 
-        zoom: 1,
+    height:100,
 
-        width: 0,
-        height: 0
+    cameraX:0,
 
-    },
+    cameraY:0,
 
-    colors: {
-
-        grass: "#6dbb55",
-
-        grid: "#5ca34d",
-
-        citizen: "#ffffff",
-
-        selected: "#00e5ff",
-
-        tree: "#2e7d32",
-
-        stone: "#888888",
-
-        house: "#8d6e63"
-
-    }
+    initialized:false
 
 };
 
@@ -53,110 +34,67 @@ const Renderer = {
     INITIALIZE
 ========================================================== */
 
-function initializeRenderer() {
+function initializeRenderer(){
 
-    Renderer.canvas =
-        document.getElementById("worldCanvas");
+    Renderer.canvas=document.getElementById("worldCanvas");
 
-    if (!Renderer.canvas) {
+    if(!Renderer.canvas){
 
-        console.error(
-            "Canvas not found."
-        );
+        Renderer.canvas=document.createElement("canvas");
 
-        return;
+        Renderer.canvas.id="worldCanvas";
+
+        Renderer.canvas.width=800;
+
+        Renderer.canvas.height=600;
+
+        Renderer.canvas.style.width="100%";
+
+        Renderer.canvas.style.border="2px solid #2f7cff";
+
+        Renderer.canvas.style.background="#13202b";
+
+        const worldTab=document.getElementById("worldTab");
+
+        if(worldTab){
+
+            worldTab.appendChild(Renderer.canvas);
+
+        }
 
     }
 
-    Renderer.ctx =
+    Renderer.ctx=
+
         Renderer.canvas.getContext("2d");
 
-    resizeCanvas();
-
-    window.addEventListener(
-
-        "resize",
-
-        resizeCanvas
-
-    );
-
-    requestAnimationFrame(
-
-        renderLoop
-
-    );
+    Renderer.initialized=true;
 
 }
 
 /* ==========================================================
-    RESIZE
+    UPDATE
 ========================================================== */
 
-function resizeCanvas() {
+function updateRenderer(){
 
-    Renderer.canvas.width =
-        Renderer.canvas.clientWidth;
+    if(!Renderer.initialized)
 
-    Renderer.canvas.height =
-        Renderer.canvas.clientHeight;
+        return;
 
-    Renderer.camera.width =
-        Renderer.canvas.width;
-
-    Renderer.camera.height =
-        Renderer.canvas.height;
+    drawWorld();
 
 }
 
 /* ==========================================================
-    LOOP
+    DRAW
 ========================================================== */
 
-function renderLoop() {
+function drawWorld(){
 
-    drawFrame();
+    const ctx=Renderer.ctx;
 
-    requestAnimationFrame(
-
-        renderLoop
-
-    );
-
-}
-
-/* ==========================================================
-    DRAW FRAME
-========================================================== */
-
-function drawFrame() {
-
-    clearCanvas();
-
-    drawTerrain();
-
-    drawGrid();
-
-    drawResources();
-
-    drawBuildings();
-
-    drawCitizens();
-
-    drawSelection();
-
-}
-
-/* ==========================================================
-    CLEAR
-========================================================== */
-
-function clearCanvas() {
-
-    Renderer.ctx.fillStyle =
-        Renderer.colors.grass;
-
-    Renderer.ctx.fillRect(
+    ctx.clearRect(
 
         0,
 
@@ -168,15 +106,11 @@ function clearCanvas() {
 
     );
 
-}
+    drawGrid();
 
-/* ==========================================================
-    TERRAIN
-========================================================== */
+    drawBuildings();
 
-function drawTerrain() {
-
-    // Placeholder
+    drawCitizens();
 
 }
 
@@ -184,28 +118,13 @@ function drawTerrain() {
     GRID
 ========================================================== */
 
-function drawGrid() {
+function drawGrid(){
 
-    const ctx = Renderer.ctx;
+    const ctx=Renderer.ctx;
 
-    const size =
-        Renderer.tileSize *
-        Renderer.camera.zoom;
+    const size=Renderer.tileSize;
 
-    ctx.strokeStyle =
-        Renderer.colors.grid;
-
-    ctx.lineWidth = 1;
-
-    for (
-
-        let x = 0;
-
-        x <= Renderer.canvas.width;
-
-        x += size
-
-    ) {
+    for(let x=0;x<Renderer.canvas.width;x+=size){
 
         ctx.beginPath();
 
@@ -219,19 +138,13 @@ function drawGrid() {
 
         );
 
+        ctx.strokeStyle="#203040";
+
         ctx.stroke();
 
     }
 
-    for (
-
-        let y = 0;
-
-        y <= Renderer.canvas.height;
-
-        y += size
-
-    ) {
+    for(let y=0;y<Renderer.canvas.height;y+=size){
 
         ctx.beginPath();
 
@@ -245,6 +158,8 @@ function drawGrid() {
 
         );
 
+        ctx.strokeStyle="#203040";
+
         ctx.stroke();
 
     }
@@ -252,108 +167,32 @@ function drawGrid() {
 }
 
 /* ==========================================================
-    RESOURCES
-========================================================== */
-
-function drawResources() {
-
-    if (
-
-        !World.resources.nodes
-
-    )
-
-        return;
-
-    const ctx =
-        Renderer.ctx;
-
-    const size =
-        Renderer.tileSize;
-
-    World.resources.nodes.forEach(
-
-        node => {
-
-            let color =
-                Renderer.colors.tree;
-
-            if (
-
-                node.type === "stone"
-
-            )
-
-                color =
-                Renderer.colors.stone;
-
-            ctx.fillStyle =
-                color;
-
-            ctx.beginPath();
-
-            ctx.arc(
-
-                node.x * size +
-
-                size/2,
-
-                node.y * size +
-
-                size/2,
-
-                size/4,
-
-                0,
-
-                Math.PI*2
-
-            );
-
-            ctx.fill();
-
-        }
-
-    );
-
-}
-
-/* ==========================================================
     BUILDINGS
 ========================================================== */
 
-function drawBuildings() {
+function drawBuildings(){
 
-    if (
+    const ctx=Renderer.ctx;
 
-        !World.buildings
+    BuildingEngine.buildings.forEach(
 
-    )
+        building=>{
 
-        return;
-
-    const ctx =
-        Renderer.ctx;
-
-    const size =
-        Renderer.tileSize;
-
-    World.buildings.forEach(
-
-        building => {
-
-            ctx.fillStyle =
-                Renderer.colors.house;
+            ctx.fillStyle="#a67c52";
 
             ctx.fillRect(
 
-                building.x * size,
+                building.x*
 
-                building.y * size,
+                Renderer.tileSize,
 
-                size,
+                building.y*
 
-                size
+                Renderer.tileSize,
+
+                Renderer.tileSize,
+
+                Renderer.tileSize
 
             );
 
@@ -362,114 +201,46 @@ function drawBuildings() {
     );
 
 }
+
 /* ==========================================================
     CITIZENS
 ========================================================== */
 
-function drawCitizens() {
+function drawCitizens(){
 
-    if (!citizens) return;
+    const ctx=Renderer.ctx;
 
-    const ctx = Renderer.ctx;
-    const size = Renderer.tileSize;
+    citizens.forEach(citizen=>{
 
-    citizens.forEach(citizen => {
-
-        const x =
-            citizen.position.x * size;
-
-        const y =
-            citizen.position.y * size;
-
-        // Body
         ctx.beginPath();
-        ctx.fillStyle =
-            Renderer.colors.citizen;
 
         ctx.arc(
-            x + size / 2,
-            y + size / 2,
-            size * 0.28,
+
+            citizen.position.x*
+
+            Renderer.tileSize+
+
+            Renderer.tileSize/2,
+
+            citizen.position.y*
+
+            Renderer.tileSize+
+
+            Renderer.tileSize/2,
+
+            Renderer.tileSize/3,
+
             0,
-            Math.PI * 2
+
+            Math.PI*2
+
         );
+
+        ctx.fillStyle="#4caf50";
 
         ctx.fill();
 
-        // Job indicator
-        ctx.fillStyle = "#222";
-
-        ctx.font = "10px Arial";
-
-        ctx.fillText(
-            citizen.job.title.charAt(0),
-            x + 6,
-            y + 10
-        );
-
     });
-
-}
-
-/* ==========================================================
-    SELECTED CITIZEN
-========================================================== */
-
-function drawSelection() {
-
-    if (!selectedCitizen)
-        return;
-
-    const ctx =
-        Renderer.ctx;
-
-    const size =
-        Renderer.tileSize;
-
-    const x =
-        selectedCitizen.position.x *
-        size;
-
-    const y =
-        selectedCitizen.position.y *
-        size;
-
-    ctx.strokeStyle =
-        Renderer.colors.selected;
-
-    ctx.lineWidth = 3;
-
-    ctx.strokeRect(
-
-        x,
-
-        y,
-
-        size,
-
-        size
-
-    );
-
-}
-
-/* ==========================================================
-    SCREEN -> WORLD
-========================================================== */
-
-function screenToWorld(x, y) {
-
-    const size =
-        Renderer.tileSize *
-        Renderer.camera.zoom;
-
-    return {
-
-        x: Math.floor(x / size),
-
-        y: Math.floor(y / size)
-
-    };
 
 }
 
@@ -477,203 +248,32 @@ function screenToWorld(x, y) {
     CAMERA
 ========================================================== */
 
-function centerCameraOnCitizen(citizen) {
+function centerCamera(x,y){
 
-    Renderer.camera.x =
+    Renderer.cameraX=x;
 
-        citizen.position.x *
-        Renderer.tileSize -
-
-        Renderer.camera.width / 2;
-
-    Renderer.camera.y =
-
-        citizen.position.y *
-        Renderer.tileSize -
-
-        Renderer.camera.height / 2;
+    Renderer.cameraY=y;
 
 }
 
 /* ==========================================================
-    ZOOM
+    RESIZE
 ========================================================== */
 
-function zoomIn() {
+window.addEventListener(
 
-    Renderer.camera.zoom += 0.10;
+    "resize",
 
-    Renderer.camera.zoom =
+    ()=>{
 
-        Math.min(
+        if(!Renderer.canvas)
 
-            Renderer.camera.zoom,
+            return;
 
-            4
+        Renderer.canvas.width=
 
-        );
+            Renderer.canvas.clientWidth;
 
-}
+    }
 
-function zoomOut() {
-
-    Renderer.camera.zoom -= 0.10;
-
-    Renderer.camera.zoom =
-
-        Math.max(
-
-            Renderer.camera.zoom,
-
-            0.40
-
-        );
-
-}
-
-/* ==========================================================
-    CLICK SELECTION
-========================================================== */
-
-function setupRendererInput() {
-
-    Renderer.canvas.addEventListener(
-
-        "click",
-
-        event => {
-
-            const rect =
-
-                Renderer.canvas.getBoundingClientRect();
-
-            const world =
-
-                screenToWorld(
-
-                    event.clientX - rect.left,
-
-                    event.clientY - rect.top
-
-                );
-
-            let closest = null;
-
-            citizens.forEach(citizen => {
-
-                if (
-
-                    citizen.position.x === world.x &&
-
-                    citizen.position.y === world.y
-
-                ) {
-
-                    closest = citizen;
-
-                }
-
-            });
-
-            if (closest) {
-
-                selectCitizen(
-
-                    closest.identity.id
-
-                );
-
-            }
-
-        }
-
-    );
-
-}
-
-/* ==========================================================
-    DEBUG
-========================================================== */
-
-function drawDebug() {
-
-    const ctx =
-        Renderer.ctx;
-
-    ctx.fillStyle = "white";
-
-    ctx.font = "14px Arial";
-
-    ctx.fillText(
-
-        "Citizens: " +
-
-        citizens.length,
-
-        10,
-
-        20
-
-    );
-
-    ctx.fillText(
-
-        "FPS Target: 30",
-
-        10,
-
-        40
-
-    );
-
-    ctx.fillText(
-
-        "Zoom: " +
-
-        Renderer.camera.zoom.toFixed(2),
-
-        10,
-
-        60
-
-    );
-
-}
-
-/* ==========================================================
-    UPDATE DRAW FRAME
-========================================================== */
-
-const originalDrawFrame = drawFrame;
-
-drawFrame = function () {
-
-    clearCanvas();
-
-    drawTerrain();
-
-    drawGrid();
-
-    drawResources();
-
-    drawBuildings();
-
-    drawCitizens();
-
-    drawSelection();
-
-    drawDebug();
-
-};
-
-/* ==========================================================
-    STARTUP
-========================================================== */
-
-window.addEventListener("load", () => {
-
-    initializeRenderer();
-
-    setupRendererInput();
-
-});
+);
