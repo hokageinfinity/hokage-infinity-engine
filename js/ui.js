@@ -1,48 +1,74 @@
 /* ==========================================================
-   Hokage Infinity Engine
+   Hokage Infinity World
    ui.js
-   Engine Alpha 1
+   Integrated Engine Version 1.0
 ========================================================== */
 
 "use strict";
 
 /* ==========================================================
-    ELEMENTS
+    UI ENGINE
 ========================================================== */
 
-const citizensList =
-    document.getElementById("citizensList");
+const UI = {
 
-const citizenProfile =
-    document.getElementById("citizenProfile");
+    selectedCitizen: null,
 
-const storyFeed =
-    document.getElementById("storyFeed");
+    initialized: false
 
-const citizenSearch =
-    document.getElementById("citizenSearch");
-
-const worldPrompt =
-    document.getElementById("worldPrompt");
-
-const applyPromptBtn =
-    document.getElementById("applyPromptBtn");
+};
 
 /* ==========================================================
-    INITIALIZE UI
+    INITIALIZE
 ========================================================== */
 
-function initializeUI() {
+function initializeUI(){
 
-    updateCitizenList();
+    if(UI.initialized) return;
 
-    updateCitizenPanel();
+    setupTabs();
 
-    updateStoryFeed();
+    setupButtons();
 
     setupSearch();
 
-    setupPromptButton();
+    UI.initialized = true;
+
+}
+
+/* ==========================================================
+    UPDATE EVERYTHING
+========================================================== */
+
+function updateAllUI(){
+
+    updateWorldStats();
+
+    updateCitizenList();
+
+    updateHistory();
+
+}
+
+/* ==========================================================
+    WORLD STATS
+========================================================== */
+
+function updateWorldStats(){
+
+    setText("year",World.time.year);
+
+    setText("day",World.time.day);
+
+    setText("population",citizens.length);
+
+    setText("food",getResource("food"));
+
+    setText("wood",getResource("wood"));
+
+    setText("stone",getResource("stone"));
+
+    setText("gold",getResource("gold"));
 
 }
 
@@ -50,105 +76,93 @@ function initializeUI() {
     CITIZEN LIST
 ========================================================== */
 
-function updateCitizenList() {
+function updateCitizenList(){
 
-    if (!citizensList) return;
+    const list=document.getElementById("citizensList");
 
-    citizensList.innerHTML = "";
+    if(!list) return;
 
-    let search = "";
+    list.innerHTML="";
 
-    if (citizenSearch) {
+    citizens.forEach(citizen=>{
 
-        search = citizenSearch.value
-            .toLowerCase()
-            .trim();
+        const card=document.createElement("div");
 
-    }
+        card.className="citizenCard";
 
-    citizens.forEach(citizen => {
+        card.innerHTML=`
 
-        const fullName =
-            citizen.identity.firstName +
-            " " +
-            citizen.identity.lastName;
+            <strong>${citizen.identity.first} ${citizen.identity.last}</strong><br>
 
-        if (
-            search &&
-            !fullName.toLowerCase().includes(search)
-        ) {
-            return;
-        }
+            Age: ${citizen.identity.age}<br>
 
-        const card =
-            document.createElement("div");
+            Job: ${citizen.job.title}<br>
 
-        card.className = "citizen";
+            Mood: ${overallMood(citizen)}<br>
 
-        card.innerHTML = `
-            <strong>${fullName}</strong><br>
-            ${citizen.job.title}<br>
-            Age ${citizen.identity.age}
+            Goal: ${citizen.goal}<br>
+
         `;
 
-        card.onclick = () => {
+        card.onclick=()=>{
 
-            selectCitizen(
-                citizen.identity.id
-            );
+            selectCitizen(citizen);
 
         };
 
-        citizensList.appendChild(card);
+        list.appendChild(card);
 
     });
 
 }
 
 /* ==========================================================
-    PROFILE
+    HISTORY
 ========================================================== */
 
-function updateCitizenPanel() {
+function updateHistory(){
 
-    if (!citizenProfile) return;
+    const history=document.getElementById("history");
 
-    citizenProfile.textContent =
-        getCitizenProfile(
-            selectedCitizen
-        );
+    if(!history) return;
+
+    history.innerHTML="";
+
+    StoryEngine.history
+
+        .slice(0,100)
+
+        .forEach(entry=>{
+
+            const div=document.createElement("div");
+
+            div.textContent=
+
+                `[Y${entry.year} D${entry.day}] ${entry.text}`;
+
+            history.appendChild(div);
+
+        });
 
 }
 
 /* ==========================================================
-    STORY FEED
+    SELECT CITIZEN
 ========================================================== */
 
-function updateStoryFeed() {
+function selectCitizen(citizen){
 
-    if (!storyFeed) return;
+    UI.selectedCitizen=citizen;
 
-    storyFeed.innerHTML = "";
+    console.log(
 
-    World.history.forEach(event => {
+        "Selected Citizen:",
 
-        const div =
-            document.createElement("div");
+        citizen.identity.first,
 
-        div.className =
-            "storyEntry";
+        citizen.identity.last
 
-        div.innerHTML = `
-            <strong>
-            Year ${event.year}
-            Day ${event.day}
-            </strong><br>
-            ${event.message}
-        `;
-
-        storyFeed.appendChild(div);
-
-    });
+    );
 
 }
 
@@ -156,61 +170,150 @@ function updateStoryFeed() {
     SEARCH
 ========================================================== */
 
-function setupSearch() {
+function setupSearch(){
 
-    if (!citizenSearch) return;
+    const input=document.getElementById(
 
-    citizenSearch.addEventListener(
+        "citizenSearch"
+
+    );
+
+    if(!input) return;
+
+    input.addEventListener(
 
         "input",
 
-        updateCitizenList
+        ()=>{
+
+            const value=
+
+                input.value.toLowerCase();
+
+            const cards=
+
+                document.querySelectorAll(
+
+                    ".citizenCard"
+
+                );
+
+            cards.forEach(card=>{
+
+                if(
+
+                    card.textContent
+
+                    .toLowerCase()
+
+                    .includes(value)
+
+                ){
+
+                    card.style.display="block";
+
+                }
+
+                else{
+
+                    card.style.display="none";
+
+                }
+
+            });
+
+        }
 
     );
 
 }
 
 /* ==========================================================
-    GOD PROMPT
+    BUTTONS
 ========================================================== */
 
-function setupPromptButton() {
+function setupButtons(){
 
-    if (!applyPromptBtn) return;
+    const save=document.getElementById("saveBtn");
 
-    applyPromptBtn.addEventListener(
+    const load=document.getElementById("loadBtn");
 
-        "click",
+    const reset=document.getElementById("resetBtn");
 
-        () => {
+    if(save) save.onclick=saveWorld;
 
-            const prompt =
-                worldPrompt.value.trim();
+    if(load) load.onclick=()=>{
 
-            if (!prompt) return;
+        loadWorld();
 
-            if (
-                typeof applyWorldPrompt ===
-                "function"
-            ) {
+        updateAllUI();
 
-                applyWorldPrompt(prompt);
+    };
 
-            }
-            else {
+    if(reset) reset.onclick=resetWorld;
 
-                addWorldStory(
-                    "God: " + prompt
-                );
+}
 
-            }
+/* ==========================================================
+    TABS
+========================================================== */
 
-            worldPrompt.value = "";
+function setupTabs(){
 
-            updateStoryFeed();
+    const buttons=document.querySelectorAll(".tabBtn");
 
-        }
+    buttons.forEach(button=>{
 
-    );
+        button.onclick=()=>{
+
+            document
+
+                .querySelectorAll(".tab")
+
+                .forEach(tab=>{
+
+                    tab.classList.remove("active");
+
+                });
+
+            buttons.forEach(b=>{
+
+                b.classList.remove("active");
+
+            });
+
+            button.classList.add("active");
+
+            document
+
+                .getElementById(
+
+                    button.dataset.tab
+
+                )
+
+                .classList.add("active");
+
+        };
+
+    });
+
+}
+
+/* ==========================================================
+    HELPER
+========================================================== */
+
+function setText(id,value){
+
+    const element=
+
+        document.getElementById(id);
+
+    if(element){
+
+        element.textContent=value;
+
+    }
 
 }
