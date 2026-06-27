@@ -1,51 +1,219 @@
 /* ==========================================================
-   Hokage Infinity Engine
+   Hokage Infinity World
    simulation.js
-   Engine Alpha 1
+   Integrated Engine Version 1.0
 ========================================================== */
 
 "use strict";
 
 /* ==========================================================
-    ENGINE SETTINGS
+    SIMULATION ENGINE
 ========================================================== */
 
 const Simulation = {
 
-    running: false,
+    tick: 0,
 
-    ticks: 0,
+    dayLength: 288,
 
-    fps: 30,
-
-    tickLength: 1000 / 30,
-
-    timer: null,
-
-    minutesPerTick: 5
+    running: true
 
 };
+
+/* ==========================================================
+    ADVANCE TIME
+========================================================== */
+
+function advanceTime(){
+
+    Simulation.tick++;
+
+    World.time.minute += 5;
+
+    if(World.time.minute >= 60){
+
+        World.time.minute = 0;
+        World.time.hour++;
+
+    }
+
+    if(World.time.hour >= 24){
+
+        World.time.hour = 0;
+        World.time.day++;
+
+        runDailySimulation();
+
+    }
+
+    if(World.time.day > 365){
+
+        World.time.day = 1;
+        World.time.year++;
+
+    }
+
+}
+
+/* ==========================================================
+    DAILY SIMULATION
+========================================================== */
+
+function runDailySimulation(){
+
+    citizens.forEach(citizen=>{
+
+        updateCitizenNeeds(citizen);
+
+        updateCitizenGoals(citizen);
+
+        generateThought(citizen);
+
+    });
+
+}
+
+/* ==========================================================
+    NEEDS
+========================================================== */
+
+function updateCitizenNeeds(citizen){
+
+    citizen.needs.hunger += 2;
+
+    citizen.needs.energy -= 3;
+
+    citizen.needs.social -= 1;
+
+    citizen.needs.happiness -= 0.5;
+
+    clampNeeds(citizen);
+
+}
+
+/* ==========================================================
+    LIMIT VALUES
+========================================================== */
+
+function clampNeeds(citizen){
+
+    Object.keys(citizen.needs).forEach(key=>{
+
+        if(citizen.needs[key] < 0)
+            citizen.needs[key]=0;
+
+        if(citizen.needs[key] > 100)
+            citizen.needs[key]=100;
+
+    });
+
+}
+
+/* ==========================================================
+    GOALS
+========================================================== */
+
+function updateCitizenGoals(citizen){
+
+    if(citizen.needs.hunger>75){
+
+        citizen.goal="Eat";
+
+        return;
+
+    }
+
+    if(citizen.needs.energy<25){
+
+        citizen.goal="Sleep";
+
+        return;
+
+    }
+
+    if(citizen.job.title==="Farmer"){
+
+        citizen.goal="Farm";
+
+        return;
+
+    }
+
+    if(citizen.job.title==="Miner"){
+
+        citizen.goal="Mine";
+
+        return;
+
+    }
+
+    if(citizen.job.title==="Builder"){
+
+        citizen.goal="Build";
+
+        return;
+
+    }
+
+    citizen.goal="Socialize";
+
+}
+
+/* ==========================================================
+    DAY/NIGHT
+========================================================== */
+
+function isDaytime(){
+
+    return World.time.hour>=6 &&
+
+           World.time.hour<20;
+
+}
+
+/* ==========================================================
+    UPDATE WORLD
+========================================================== */
+
+function updateSimulation(){
+
+    advanceTime();
+
+    updateJobs();
+
+    updateBuildings();
+
+    resourceTick();
+
+    updatePathfinding();
+
+    updateRelationships();
+
+    updateEmotions();
+
+    conversationTick();
+
+    eventTick();
+
+}
+
+/* ==========================================================
+    TICK
+========================================================== */
+
+function simulationTick(){
+
+    updateSimulation();
+
+}
 
 /* ==========================================================
     START
 ========================================================== */
 
-function startSimulation() {
+function startSimulation(){
 
-    if (Simulation.running)
-        return;
-
-    Simulation.running = true;
-
-    Simulation.timer = setInterval(
-
-        simulationTick,
-
-        Simulation.tickLength
-
-    );
-
-    console.log("Simulation Started");
+    Simulation.running=true;
 
 }
 
@@ -53,203 +221,8 @@ function startSimulation() {
     STOP
 ========================================================== */
 
-function stopSimulation() {
+function stopSimulation(){
 
-    Simulation.running = false;
-
-    clearInterval(
-
-        Simulation.timer
-
-    );
-
-}
-
-/* ==========================================================
-    MAIN TICK
-========================================================== */
-
-function simulationTick() {
-
-    Simulation.ticks++;
-
-    World.tick++;
-
-    advanceTime(
-
-        Simulation.minutesPerTick
-
-    );
-
-    updateCitizens();
-
-    updateWorld();
-
-    updateInterface();
-
-}
-
-/* ==========================================================
-    WORLD UPDATE
-========================================================== */
-
-function updateWorld() {
-
-    updatePopulation();
-
-    updateWeather();
-
-    updateResources();
-
-}
-
-/* ==========================================================
-    POPULATION
-========================================================== */
-
-function updatePopulation() {
-
-    World.population.total =
-
-        citizens.length;
-
-}
-
-/* ==========================================================
-    WEATHER
-========================================================== */
-
-function updateWeather() {
-
-    if (Math.random() < 0.002) {
-
-        const weather = [
-
-            "Sunny",
-
-            "Cloudy",
-
-            "Rain",
-
-            "Storm"
-
-        ];
-
-        World.weather.type =
-
-            randomChoice(weather);
-
-    }
-
-}
-
-/* ==========================================================
-    RESOURCES
-========================================================== */
-
-function updateResources() {
-
-    World.resources.food += 1;
-
-    World.resources.wood += 1;
-
-    World.resources.stone += 1;
-
-}
-
-/* ==========================================================
-    UPDATE UI
-========================================================== */
-
-function updateInterface() {
-
-    updateTopBar();
-
-    updateCitizenList();
-
-    updateStoryFeed();
-
-    updateCitizenPanel();
-
-}
-
-/* ==========================================================
-    TOP BAR
-========================================================== */
-
-function updateTopBar() {
-
-    document.getElementById("year").textContent =
-        World.time.year;
-
-    document.getElementById("season").textContent =
-        World.time.season;
-
-    document.getElementById("day").textContent =
-        World.time.day;
-
-    const hour =
-
-        String(
-
-            World.time.hour
-
-        ).padStart(2,"0");
-
-    const minute =
-
-        String(
-
-            World.time.minute
-
-        ).padStart(2,"0");
-
-    document.getElementById("time").textContent =
-
-        hour + ":" + minute;
-
-    document.getElementById("population").textContent =
-
-        World.population.total;
-
-}
-
-/* ==========================================================
-    STORY
-========================================================== */
-
-let lastStoryTick = 0;
-
-function maybeCreateStoryEvent() {
-
-    if (
-
-        Simulation.ticks -
-
-        lastStoryTick < 300
-
-    )
-
-        return;
-
-    lastStoryTick =
-
-        Simulation.ticks;
-
-    const citizen =
-
-        randomChoice(citizens);
-
-    addWorldStory(
-
-        citizen.identity.firstName +
-
-        " spent the day working as a " +
-
-        citizen.job.title +
-
-        "."
-
-    );
+    Simulation.running=false;
 
 }
