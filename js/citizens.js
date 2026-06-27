@@ -1,479 +1,400 @@
 /* ==========================================================
-   Hokage Infinity Engine
+   Hokage Infinity World
    citizens.js
-   Engine Alpha 1
+   Integrated Engine Version 1.0
+   Part 1 / 2
 ========================================================== */
 
-const citizens = [];
+"use strict";
 
 /* ==========================================================
-    ID GENERATOR
+    CITIZEN STORAGE
 ========================================================== */
 
-let citizenCounter = 1;
-
-function generateCitizenID() {
-
-    const id = String(citizenCounter).padStart(6, "0");
-
-    citizenCounter++;
-
-    return "citizen-" + id;
-
-}
-
-/* ==========================================================
-    RANDOM HELPERS
-========================================================== */
-
-function randomNumber(min, max) {
-
-    return Math.floor(
-        Math.random() * (max - min + 1)
-    ) + min;
-
-}
-
-function randomChoice(array) {
-
-    return array[
-        randomNumber(0, array.length - 1)
-    ];
-
-}
-
-/* ==========================================================
-    NAME HELPERS
-========================================================== */
-
-const firstNames = [
-
-    "Kai",
-    "Aiko",
-    "Ren",
-    "Mina",
-    "Akira",
-    "Hana",
-    "Leo",
-    "Sora",
-    "Noah",
-    "Luna",
-    "Atlas",
-    "Nova",
-    "Riku",
-    "Yuki",
-    "Asher",
-    "Emma"
-
-];
-
-const lastNames = [
-
-    "Tanaka",
-    "Ravens",
-    "Walker",
-    "Stone",
-    "Black",
-    "River",
-    "Ash",
-    "Storm",
-    "Frost",
-    "Vale",
-    "Hollow",
-    "Knight"
-
-];
-
-/* ==========================================================
-    TRAITS
-========================================================== */
-
-const personalityTraits = [
-
-    "Brave",
-    "Curious",
-    "Kind",
-    "Greedy",
-    "Patient",
-    "Creative",
-    "Loyal",
-    "Stubborn",
-    "Calm",
-    "Optimistic",
-    "Pessimistic",
-    "Honest",
-    "Quiet",
-    "Leader"
-
-];
-
-/* ==========================================================
-    JOBS
-========================================================== */
-
-const jobs = [
-
-    "Farmer",
-
-    "Builder",
-
-    "Miner",
-
-    "Hunter",
-
-    "Gatherer",
-
-    "Blacksmith",
-
-    "Merchant",
-
-    "Scientist"
-
-];
+let citizens = [];
 
 /* ==========================================================
     CREATE CITIZEN
 ========================================================== */
 
-function createCitizen() {
+function createCitizen(){
+
+    const name = generateUniqueCitizenName();
+
+    const position = randomWorldPosition();
 
     const citizen = {
 
-        /* ==========================
-            IDENTITY
-        ========================== */
+        /* ---------- Identity ---------- */
 
-        identity: {
+        identity:{
 
-            id: generateCitizenID(),
+            id:crypto.randomUUID(),
 
-            firstName: randomChoice(firstNames),
+            first:name.first,
 
-            lastName: randomChoice(lastNames),
+            last:name.last,
+
+            age:Math.floor(Math.random()*40)+18,
 
             gender:
 
-                Math.random() > 0.5
+                Math.random()<0.5
 
-                ? "Male"
+                ?"Male"
 
-                : "Female",
-
-            age: randomNumber(18,45)
+                :"Female"
 
         },
 
-        /* ==========================
-            POSITION
-        ========================== */
+        /* ---------- Position ---------- */
 
-        position: {
+        position:{
 
-            x: randomNumber(
+            x:position.x,
 
-                0,
-
-                World.settings.width-1
-
-            ),
-
-            y: randomNumber(
-
-                0,
-
-                World.settings.height-1
-
-            )
+            y:position.y
 
         },
 
-        /* ==========================
-            MIND
-        ========================== */
+        path:[],
 
-        mind: {
+        /* ---------- Life ---------- */
 
-            currentThought:
+        alive:true,
 
-            "Exploring the world.",
+        health:100,
 
-            goals: [],
+        energy:100,
 
-            memories: [],
+        hunger:0,
 
-            dreams: [],
+        /* ---------- Needs ---------- */
 
-            beliefs: []
+        needs:{
 
-        },
+            hunger:0,
 
-        /* ==========================
-            PERSONALITY
-        ========================== */
+            energy:100,
 
-        personality: {
+            social:80,
 
-            traitOne:
-
-            randomChoice(personalityTraits),
-
-            traitTwo:
-
-            randomChoice(personalityTraits),
-
-            curiosity:
-
-            randomNumber(1,100),
-
-            bravery:
-
-            randomNumber(1,100),
-
-            kindness:
-
-            randomNumber(1,100),
-
-            ambition:
-
-            randomNumber(1,100)
+            happiness:80
 
         },
 
-        /* ==========================
-            EMOTIONS
-        ========================== */
+        /* ---------- Job ---------- */
 
-        emotions: {
+        job:{
 
-            happiness: 75,
-
-            stress: 5,
-
-            fear: 0,
-
-            anger: 0,
-
-            loneliness: 10
+            title:randomJob()
 
         },
 
-        /* ==========================
-            JOB
-        ========================== */
+        currentTask:"Idle",
 
-        job: {
+        goal:"Explore",
 
-            title:
+        /* ---------- Personality ---------- */
 
-            randomChoice(jobs),
+        traits:[],
 
-            skill:
+        /* ---------- Relationships ---------- */
 
-            randomNumber(1,20)
+        friends:[],
 
-        },
+        enemies:[],
 
-        /* ==========================
-            INVENTORY
-        ========================== */
+        family:[],
 
-        inventory: {
+        spouse:null,
 
-            food:0,
+        /* ---------- AI ---------- */
 
-            wood:0,
+        memories:[],
 
-            stone:0,
+        achievements:[],
 
-            gold:0
+        inventory:[],
 
-        },
+        home:null,
 
-        /* ==========================
-            RELATIONSHIPS
-        ========================== */
+        workplace:null,
 
-        relationships: {
+        dailySchedule:[],
 
-            friends:[],
+        currentThought:"",
 
-            family:[],
-
-            rivals:[],
-
-            spouse:null
-
-        },
-
-        /* ==========================
-            LIFE
-        ========================== */
-
-        life:{
-
-            alive:true,
-
-            birthday:
-
-            randomNumber(1,90),
-
-            accomplishments:[]
-
-        }
+        currentConversation:null
 
     };
 
     citizens.push(citizen);
-
-    World.population.total++;
 
     return citizen;
 
 }
 
 /* ==========================================================
-    SPAWN STARTING POPULATION
+    INITIAL POPULATION
 ========================================================== */
 
-function createStartingPopulation(amount){
+function initializeCitizens(){
 
-    for(
+    citizens=[];
 
-        let i=0;
-
-        i<amount;
-
-        i++
-
-    ){
+    for(let i=0;i<100;i++){
 
         createCitizen();
 
     }
 
-    addWorldStory(
+}
 
-        amount +
+/* ==========================================================
+    RANDOM JOB
+========================================================== */
 
-        " settlers founded the first civilization."
+function randomJob(){
 
-    );
-  
+    const jobs=[
+
+        "Farmer",
+
+        "Builder",
+
+        "Miner",
+
+        "Merchant",
+
+        "Hunter",
+
+        "Lumberjack",
+
+        "Blacksmith"
+
+    ];
+
+    return jobs[
+
+        Math.floor(
+
+            Math.random()*jobs.length
+
+        )
+
+    ];
 
 }
+
 /* ==========================================================
     FIND CITIZEN
 ========================================================== */
 
-function getCitizenByID(id) {
+function getCitizen(id){
 
-    return citizens.find(c => c.identity.id === id);
+    return citizens.find(
+
+        c=>c.identity.id===id
+
+    );
 
 }
 
 /* ==========================================================
-    SELECTED CITIZEN
+    REMOVE CITIZEN
 ========================================================== */
 
-let selectedCitizen = null;
+function removeCitizen(id){
 
-function selectCitizen(id) {
+    citizens=
 
-    selectedCitizen = getCitizenByID(id);
+        citizens.filter(
 
-    if (typeof updateCitizenProfile === "function") {
+            c=>c.identity.id!==id
 
-        updateCitizenProfile();
+        );
+
+}
+
+/* ==========================================================
+    MEMORY
+========================================================== */
+
+function addMemory(
+
+    citizen,
+
+    memory
+
+){
+
+    citizen.memories.unshift({
+
+        text:memory,
+
+        year:World.time.year,
+
+        day:World.time.day
+
+    });
+
+    if(citizen.memories.length>100){
+
+        citizen.memories.pop();
 
     }
 
 }
 
 /* ==========================================================
-    MOVEMENT
+    ACHIEVEMENTS
 ========================================================== */
 
-function moveCitizen(citizen) {
+function addAchievement(
 
-    const dx = randomNumber(-1, 1);
-    const dy = randomNumber(-1, 1);
+    citizen,
 
-    citizen.position.x += dx;
-    citizen.position.y += dy;
+    achievement
 
-    citizen.position.x = Math.max(
-        0,
-        Math.min(
-            citizen.position.x,
-            World.settings.width - 1
+){
+
+    if(
+
+        !citizen.achievements.includes(
+
+            achievement
+
         )
-    );
 
-    citizen.position.y = Math.max(
-        0,
-        Math.min(
-            citizen.position.y,
-            World.settings.height - 1
-        )
-    );
+    ){
+
+        citizen.achievements.push(
+
+            achievement
+
+        );
+
+    }
+
+}
+/* ==========================================================
+    AGING
+========================================================== */
+
+function updateCitizenAge(citizen){
+
+    if(
+        World.time.day === 1 &&
+        World.time.hour === 0 &&
+        World.time.minute === 0
+    ){
+        citizen.identity.age++;
+    }
 
 }
 
 /* ==========================================================
-    THINKING
+    LIFE
 ========================================================== */
 
-function updateCitizenThought(citizen) {
+function updateCitizenLife(citizen){
 
-    const thoughts = [
+    if(citizen.health<=0){
 
-        "Looking for food.",
+        citizen.alive=false;
 
-        "Exploring.",
+        World.statistics.deaths++;
 
-        "Thinking about the future.",
+        addStory(
+            StoryEngine.categories.CITIZEN,
+            citizen.identity.first +
+            " has died."
+        );
 
-        "Working hard today.",
-
-        "Watching nature.",
-
-        "Gathering resources.",
-
-        "Building something useful.",
-
-        "Wondering what tomorrow brings."
-
-    ];
-
-    citizen.mind.currentThought =
-        randomChoice(thoughts);
+    }
 
 }
 
 /* ==========================================================
-    EMOTIONS
+    INVENTORY
 ========================================================== */
 
-function updateCitizenEmotion(citizen) {
+function addInventoryItem(
 
-    citizen.emotions.happiness += randomNumber(-2, 2);
-    citizen.emotions.stress += randomNumber(-1, 2);
+    citizen,
 
-    citizen.emotions.happiness = Math.max(
-        0,
-        Math.min(
-            100,
-            citizen.emotions.happiness
-        )
-    );
+    item,
 
-    citizen.emotions.stress = Math.max(
-        0,
-        Math.min(
-            100,
-            citizen.emotions.stress
-        )
-    );
+    amount=1
+
+){
+
+    citizen.inventory.push({
+
+        item,
+
+        amount
+
+    });
+
+}
+
+function removeInventoryItem(
+
+    citizen,
+
+    item
+
+){
+
+    citizen.inventory=
+
+        citizen.inventory.filter(
+
+            i=>i.item!==item
+
+        );
+
+}
+
+/* ==========================================================
+    DAILY ROUTINE
+========================================================== */
+
+function updateDailySchedule(citizen){
+
+    const hour=World.time.hour;
+
+    if(hour>=6 && hour<8){
+
+        citizen.currentTask="Wake Up";
+
+    }
+
+    else if(hour>=8 && hour<17){
+
+        citizen.currentTask="Working";
+
+    }
+
+    else if(hour>=17 && hour<20){
+
+        citizen.currentTask="Socializing";
+
+    }
+
+    else if(hour>=20 && hour<22){
+
+        citizen.currentTask="Relaxing";
+
+    }
+
+    else{
+
+        citizen.currentTask="Sleeping";
+
+    }
 
 }
 
@@ -481,32 +402,66 @@ function updateCitizenEmotion(citizen) {
     GOALS
 ========================================================== */
 
-function updateCitizenGoals(citizen) {
+function updateCitizenAI(citizen){
 
-    if (citizen.mind.goals.length > 0)
-        return;
+    if(citizen.goal==="Explore"){
 
-    const goals = [
+        if(
+            !citizen.path ||
+            citizen.path.length===0
+        ){
 
-        "Collect food",
+            const target=randomWorldPosition();
 
-        "Build a house",
+            moveCitizenTo(
 
-        "Explore",
+                citizen,
 
-        "Make a friend",
+                target.x,
 
-        "Gather wood",
+                target.y
 
-        "Mine stone",
+            );
 
-        "Learn a new skill"
+        }
 
-    ];
+    }
 
-    citizen.mind.goals.push(
-        randomChoice(goals)
-    );
+}
+
+/* ==========================================================
+    HAPPINESS
+========================================================== */
+
+function calculateCitizenHappiness(citizen){
+
+    citizen.needs.happiness=
+
+        100-
+
+        citizen.needs.hunger+
+
+        citizen.needs.energy/2;
+
+    if(
+
+        citizen.needs.happiness>100
+
+    ){
+
+        citizen.needs.happiness=100;
+
+    }
+
+    if(
+
+        citizen.needs.happiness<0
+
+    ){
+
+        citizen.needs.happiness=0;
+
+    }
 
 }
 
@@ -514,39 +469,75 @@ function updateCitizenGoals(citizen) {
     MEMORIES
 ========================================================== */
 
-function addCitizenMemory(citizen, memory) {
+function updateCitizenMemories(citizen){
 
-    citizen.mind.memories.unshift({
+    if(Math.random()<0.001){
 
-        year: World.time.year,
+        addMemory(
 
-        day: World.time.day,
+            citizen,
 
-        text: memory
+            "Had an ordinary day."
 
-    });
-
-    if (citizen.mind.memories.length > 100) {
-
-        citizen.mind.memories.pop();
+        );
 
     }
 
 }
 
 /* ==========================================================
-    UPDATE ONE CITIZEN
+    ACHIEVEMENTS
 ========================================================== */
 
-function updateCitizen(citizen) {
+function updateCitizenAchievements(citizen){
 
-    moveCitizen(citizen);
+    if(
 
-    updateCitizenThought(citizen);
+        citizen.identity.age>=50 &&
 
-    updateCitizenEmotion(citizen);
+        !citizen.achievements.includes(
 
-    updateCitizenGoals(citizen);
+            "Village Elder"
+
+        )
+
+    ){
+
+        addAchievement(
+
+            citizen,
+
+            "Village Elder"
+
+        );
+
+    }
+
+}
+
+/* ==========================================================
+    UPDATE ONE
+========================================================== */
+
+function updateCitizen(citizen){
+
+    if(!citizen.alive)
+
+        return;
+
+    updateCitizenAge(citizen);
+
+    updateCitizenLife(citizen);
+
+    updateDailySchedule(citizen);
+
+    updateCitizenAI(citizen);
+
+    calculateCitizenHappiness(citizen);
+
+    updateCitizenMemories(citizen);
+
+    updateCitizenAchievements(citizen);
 
 }
 
@@ -554,91 +545,88 @@ function updateCitizen(citizen) {
     UPDATE ALL
 ========================================================== */
 
-function updateCitizens() {
+function updateCitizens(){
 
-    citizens.forEach(citizen => {
+    citizens.forEach(
 
-        updateCitizen(citizen);
+        citizen=>{
 
-    });
+            updateCitizen(
 
-}
+                citizen
 
-/* ==========================================================
-    PROFILE TEXT
-========================================================== */
+            );
 
-function getCitizenProfile(citizen) {
+        }
 
-    if (!citizen)
-        return "Select a citizen.";
-
-    return `
-
-${citizen.identity.firstName} ${citizen.identity.lastName}
-
-ID:
-${citizen.identity.id}
-
-Age:
-${citizen.identity.age}
-
-Gender:
-${citizen.identity.gender}
-
-Job:
-${citizen.job.title}
-
-Skill:
-${citizen.job.skill}
-
-Trait 1:
-${citizen.personality.traitOne}
-
-Trait 2:
-${citizen.personality.traitTwo}
-
-Thought:
-
-${citizen.mind.currentThought}
-
-Current Goal:
-
-${citizen.mind.goals[0] || "None"}
-
-Emotion
-
-😊 Happiness:
-${citizen.emotions.happiness}
-
-😟 Stress:
-${citizen.emotions.stress}
-
-Friends:
-${citizen.relationships.friends.length}
-
-Family:
-${citizen.relationships.family.length}
-
-Memories:
-${citizen.mind.memories.length}
-
-`;
-
-}
-
-/* ==========================================================
-    STARTING WORLD
-========================================================== */
-
-function initializeCitizens() {
-
-    createStartingPopulation(100);
-
-    console.log(
-        "Created",
-        citizens.length,
-        "citizens."
     );
+
+}
+
+/* ==========================================================
+    POPULATION
+========================================================== */
+
+function getPopulation(){
+
+    return citizens.filter(
+
+        c=>c.alive
+
+    ).length;
+
+}
+
+/* ==========================================================
+    RANDOM CITIZEN
+========================================================== */
+
+function randomCitizen(){
+
+    return citizens[
+
+        Math.floor(
+
+            Math.random()*
+
+            citizens.length
+
+        )
+
+    ];
+
+}
+
+/* ==========================================================
+    FUTURE AI HOOKS
+========================================================== */
+
+function processCitizenThoughts(){
+
+    // AI Brain Phase 2
+
+}
+
+function processCitizenRelationships(){
+
+    // AI Brain Phase 2
+
+}
+
+function processCitizenConversations(){
+
+    // AI Brain Phase 2
+
+}
+
+function processCitizenDreams(){
+
+    // AI Brain Phase 3
+
+}
+
+function processCitizenPlanning(){
+
+    // AI Brain Phase 3
 
 }
