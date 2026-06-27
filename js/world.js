@@ -1,306 +1,244 @@
 /* ==========================================================
-   Hokage Infinity Engine
+   Hokage Infinity World
    world.js
-   Engine Alpha 1
+   Integrated Engine Version 1.0
 ========================================================== */
 
-const World = {
+"use strict";
 
-    version: "Engine Alpha 1",
+/* ==========================================================
+    WORLD
+========================================================== */
 
-    running: true,
+let World = {
 
-    speed: 1,
+    version: "1.0",
 
-    tick: 0,
+    seed: Date.now(),
 
-    /* =====================================
-                TIME
-    ===================================== */
+    name: "Hokage Infinity World",
 
     time: {
 
         year: 1,
-
-        season: "Spring",
-
         day: 1,
-
-        hour: 8,
-
+        hour: 6,
         minute: 0
 
     },
 
-    /* =====================================
-               WEATHER
-    ===================================== */
-
     weather: {
 
-        type: "Sunny",
+        current: "Clear",
 
         temperature: 72,
 
-        wind: 3,
-
-        rain: 0
+        wind: 5
 
     },
 
-    /* =====================================
-             WORLD SETTINGS
-    ===================================== */
+    season: "Spring",
 
-    settings: {
-
-        width: 100,
-
-        height: 100,
-
-        tileSize: 32
-
-    },
-
-    /* =====================================
-               RESOURCES
-    ===================================== */
-
-    resources: {
-
-        food: 1000,
-
-        wood: 500,
-
-        stone: 250,
-
-        gold: 100
-
-    },
-
-    /* =====================================
-             POPULATION
-    ===================================== */
-
-    population: {
-
-        total: 0,
+    statistics: {
 
         births: 0,
 
-        deaths: 0
+        deaths: 0,
 
-    },
+        conversations: 0,
 
-    /* =====================================
-               KINGDOMS
-    ===================================== */
+        buildings: 0,
 
-    kingdoms: [],
+        events: 0,
 
-    /* =====================================
-                 MAP
-    ===================================== */
+        populationPeak: 0
 
-    map: [],
-
-    /* =====================================
-             WORLD HISTORY
-    ===================================== */
-
-    history: [],
-
-    /* =====================================
-               EVENTS
-    ===================================== */
-
-    activeEvents: []
+    }
 
 };
 
 /* ==========================================================
-    CREATE MAP
+    INITIALIZE
 ========================================================== */
 
-function createWorldMap() {
+function initializeWorld(){
 
-    World.map = [];
+    updateSeason();
 
-    for (let y = 0; y < World.settings.height; y++) {
+}
 
-        const row = [];
+/* ==========================================================
+    SEASON
+========================================================== */
 
-        for (let x = 0; x < World.settings.width; x++) {
+function updateSeason(){
 
-            row.push({
+    const day = World.time.day;
 
-                x,
+    if(day <= 90){
 
-                y,
+        World.season = "Spring";
 
-                terrain: "grass",
+    }
 
-                resource: null,
+    else if(day <= 180){
 
-                building: null,
+        World.season = "Summer";
 
-                citizens: [],
+    }
 
-                discovered: true
+    else if(day <= 270){
 
-            });
+        World.season = "Autumn";
 
-        }
+    }
 
-        World.map.push(row);
+    else{
+
+        World.season = "Winter";
 
     }
 
 }
 
 /* ==========================================================
-    PLACE BASIC RESOURCES
+    WEATHER
 ========================================================== */
 
-function generateResources() {
+function updateWeather(){
 
-    for (let y = 0; y < World.settings.height; y++) {
+    const weather = [
 
-        for (let x = 0; x < World.settings.width; x++) {
+        "Clear",
 
-            const tile = World.map[y][x];
+        "Cloudy",
 
-            const roll = Math.random();
+        "Rain",
 
-            if (roll < 0.08) {
+        "Storm",
 
-                tile.resource = "tree";
+        "Fog"
 
-            }
-            else if (roll < 0.11) {
+    ];
 
-                tile.resource = "stone";
+    if(Math.random() < 0.02){
 
-            }
-            else if (roll < 0.13) {
+        World.weather.current =
 
-                tile.resource = "berries";
+            weather[
 
-            }
+                Math.floor(
 
-        }
+                    Math.random() *
+
+                    weather.length
+
+                )
+
+            ];
 
     }
 
 }
 
 /* ==========================================================
-      WORLD HISTORY
+    POPULATION
 ========================================================== */
 
-function addWorldStory(text) {
+function updatePopulationStats(){
 
-    World.history.unshift({
+    if(
 
-        year: World.time.year,
+        citizens.length >
 
-        day: World.time.day,
+        World.statistics.populationPeak
 
-        message: text
+    ){
 
-    });
+        World.statistics.populationPeak =
 
-}
-
-/* ==========================================================
-       TIME SYSTEM
-========================================================== */
-
-function advanceTime(minutes) {
-
-    World.time.minute += minutes;
-
-    while (World.time.minute >= 60) {
-
-        World.time.minute -= 60;
-
-        World.time.hour++;
-
-    }
-
-    while (World.time.hour >= 24) {
-
-        World.time.hour = 0;
-
-        World.time.day++;
-    }
-
-    while (World.time.day > 90) {
-
-        World.time.day = 1;
-
-        nextSeason();
+            citizens.length;
 
     }
 
 }
 
 /* ==========================================================
-        SEASONS
+    WORLD TICK
 ========================================================== */
 
-function nextSeason() {
+function worldTick(){
 
-    switch (World.time.season) {
+    updateSeason();
 
-        case "Spring":
+    updateWeather();
 
-            World.time.season = "Summer";
-
-            break;
-
-        case "Summer":
-
-            World.time.season = "Autumn";
-
-            break;
-
-        case "Autumn":
-
-            World.time.season = "Winter";
-
-            break;
-
-        default:
-
-            World.time.season = "Spring";
-
-            World.time.year++;
-
-    }
-
-    addWorldStory(
-
-        "The world enters " + World.time.season + "."
-
-    );
+    updatePopulationStats();
 
 }
 
 /* ==========================================================
-        START WORLD
+    GET TIME STRING
 ========================================================== */
 
-function initializeWorld() {
+function getWorldTime(){
 
-    createWorldMap();
+    return
 
-    generateResources();
+        "Year " +
 
-    addWorldStory(
+        World.time.year +
 
-        "The world has been created."
+        " Day " +
 
-    );
+        World.time.day +
+
+        " " +
+
+        String(World.time.hour)
+
+        .padStart(2,"0")
+
+        + ":" +
+
+        String(World.time.minute)
+
+        .padStart(2,"0");
+
+}
+
+/* ==========================================================
+    RANDOM POSITION
+========================================================== */
+
+function randomWorldPosition(){
+
+    return{
+
+        x:Math.floor(Math.random()*80),
+
+        y:Math.floor(Math.random()*80)
+
+    };
+
+}
+
+/* ==========================================================
+    RESET WORLD
+========================================================== */
+
+function resetWorldState(){
+
+    World.time.year = 1;
+    World.time.day = 1;
+    World.time.hour = 6;
+    World.time.minute = 0;
+
+    World.statistics.births = 0;
+    World.statistics.deaths = 0;
+    World.statistics.conversations = 0;
+    World.statistics.buildings = 0;
+    World.statistics.events = 0;
+    World.statistics.populationPeak = 0;
 
 }
