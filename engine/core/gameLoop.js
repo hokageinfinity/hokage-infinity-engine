@@ -86,6 +86,8 @@ function update(delta){
 
     updateSociety();
 
+    updateCamera();
+   
     updateRenderer();
 
     updateUI();
