@@ -116,7 +116,15 @@ function drawWorld(){
 
     /* ---------- Terrain ---------- */
 
+    if(typeof renderTerrain === "function"){
+
+    renderTerrain(Renderer.ctx);
+
+}else{
+
     drawGrid();
+
+}
 
     /* ---------- Forest ---------- */
 
