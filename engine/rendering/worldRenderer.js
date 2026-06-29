@@ -68,17 +68,23 @@ function renderTerrain(ctx){
 
             }
 
-            ctx.fillRect(
+          const screenX =
+    (x * tileSize - Camera.x) * Camera.zoom;
 
-                (x-WorldRenderer.cameraX)*size,
+const screenY =
+    (y * tileSize - Camera.y) * Camera.zoom;
 
-                (y-WorldRenderer.cameraY)*size,
+ctx.fillRect(
 
-                size,
+    screenX,
 
-                size
+    screenY,
 
-            );
+    tileSize * Camera.zoom,
+
+    tileSize * Camera.zoom
+
+);
 
         }
 
