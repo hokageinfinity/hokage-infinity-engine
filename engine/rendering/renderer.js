@@ -92,7 +92,7 @@ function updateRenderer(){
 
 function drawWorld(){
 
-    const ctx=Renderer.ctx;
+    const ctx = Renderer.ctx;
 
     ctx.clearRect(
 
@@ -106,14 +106,67 @@ function drawWorld(){
 
     );
 
+    /* ---------- Sky ---------- */
+
+    if(typeof drawSky === "function"){
+
+        drawSky();
+
+    }
+
+    /* ---------- Terrain ---------- */
+
     drawGrid();
+
+    /* ---------- Forest ---------- */
+
+    if(typeof renderTrees === "function"){
+
+        renderTrees(ctx);
+
+    }
+
+    /* ---------- Resources ---------- */
+
+    if(typeof drawResources === "function"){
+
+        drawResources();
+
+    }
+
+    /* ---------- Buildings ---------- */
 
     drawBuildings();
 
+    /* ---------- Citizens ---------- */
+
     drawCitizens();
 
-}
+    /* ---------- Effects ---------- */
 
+    if(typeof drawEffects === "function"){
+
+        drawEffects();
+
+    }
+
+    /* ---------- Weather ---------- */
+
+    if(typeof drawWeather === "function"){
+
+        drawWeather();
+
+    }
+
+    /* ---------- UI Overlay ---------- */
+
+    if(typeof drawOverlay === "function"){
+
+        drawOverlay();
+
+    }
+
+}
 /* ==========================================================
     GRID
 ========================================================== */
