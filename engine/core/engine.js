@@ -66,6 +66,27 @@ function getModule(name){
 
 function initializeEngine(){
 
+   console.clear();
+
+console.log(
+    `%c${ENGINE.name}`,
+    "font-size:22px;font-weight:bold;color:#00AAFF;"
+);
+
+console.log(
+    `Version: ${ENGINE.version}`
+);
+
+console.log(
+    `Codename: ${ENGINE.codename}`
+);
+
+console.log(
+    `Author: ${ENGINE.author}`
+);
+
+console.log("------------------------------");
+
     console.log(
 
         "Starting Hokage Infinity Engine"
