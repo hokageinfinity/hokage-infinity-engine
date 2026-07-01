@@ -1,162 +1,103 @@
 /* ==========================================================
    Hokage Infinity Engine
    engine.js
-   Core Engine Manager
 ========================================================== */
 
 "use strict";
 
-/* ==========================================================
-   ENGINE
-========================================================== */
-
 const Engine = {
-
-    version: "2.0 Alpha",
-
-    running: false,
 
     initialized: false,
 
-    modules: {},
+    running: false,
 
-    statistics: {
+    startTime: 0,
 
-        fps: 0,
-
-        ticks: 0,
-
-        citizens: 0,
-
-        memories: 0,
-
-        conversations: 0,
-
-        decisions: 0
-
-    }
+    frame: 0
 
 };
 
 /* ==========================================================
-   REGISTER MODULE
-========================================================== */
-
-function registerModule(name,module){
-
-    Engine.modules[name]=module;
-
-    console.log("Registered:",name);
-
-}
-
-/* ==========================================================
-   GET MODULE
-========================================================== */
-
-function getModule(name){
-
-    return Engine.modules[name];
-
-}
-
-/* ==========================================================
-   INITIALIZE
+   INITIALIZE ENGINE
 ========================================================== */
 
 function initializeEngine(){
 
-   console.clear();
-
-console.log(
-    `%c${ENGINE.name}`,
-    "font-size:22px;font-weight:bold;color:#00AAFF;"
-);
-
-console.log(
-    `Version: ${ENGINE.version}`
-);
-
-console.log(
-    `Codename: ${ENGINE.codename}`
-);
-
-console.log(
-    `Author: ${ENGINE.author}`
-);
-
-console.log("------------------------------");
+    console.clear();
 
     console.log(
-
-        "Starting Hokage Infinity Engine"
-
+        `%c${ENGINE.name}`,
+        "font-size:22px;font-weight:bold;color:#00AAFF;font-weight:bold;"
     );
 
-    Engine.initialized=true;
+    console.log(`Version : ${ENGINE.version}`);
+    console.log(`Codename: ${ENGINE.codename}`);
+    console.log(`Author   : ${ENGINE.author}`);
+    console.log("----------------------------");
+
+    initializeWorldSystem();
+
+    initializeAISystem();
+
+    initializeCitizenSystem();
+
+    initializeSimulationSystem();
+
+    initializeRenderer();
+
+    initializeUI();
+
+    initializeSaveSystem();
+
+    Engine.initialized = true;
+
+    Engine.startTime = performance.now();
+
+    console.log("Engine Initialized");
 
 }
 
 /* ==========================================================
-   START
+   START ENGINE
 ========================================================== */
 
 function startEngine(){
 
-    Engine.running=true;
+    if(!Engine.initialized){
 
-}
-
-/* ==========================================================
-   STOP
-========================================================== */
-
-function stopEngine(){
-
-    Engine.running=false;
-
-}
-
-/* ==========================================================
-   UPDATE STATS
-========================================================== */
-
-function updateEngineStats(){
-
-    Engine.statistics.citizens=
-
-        citizens.length;
-
-    if(typeof MemoryEngine!=="undefined"){
-
-        Engine.statistics.memories=
-
-            MemoryEngine.totalMemories;
+        initializeEngine();
 
     }
 
-    if(typeof BrainEngine!=="undefined"){
+    Engine.running = true;
 
-        Engine.statistics.decisions=
+    console.log("Starting Game Loop...");
 
-            BrainEngine.decisionsMade;
-
-    }
+    startGameLoop();
 
 }
 
 /* ==========================================================
-   TICK
+   ENGINE UPDATE
 ========================================================== */
 
 function engineTick(){
 
     if(!Engine.running)
-
         return;
 
-    Engine.statistics.ticks++;
+    Engine.frame++;
 
-    updateEngineStats();
+}
+
+/* ==========================================================
+   STOP ENGINE
+========================================================== */
+
+function stopEngine(){
+
+    Engine.running = false;
+
+    console.log("Engine Stopped");
 
 }
