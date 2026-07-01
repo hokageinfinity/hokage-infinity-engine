@@ -19,7 +19,18 @@ let simulationSpeed = 120; // milliseconds per simulation tick
 
 function startGame() {
 
-    console.log("Loading Hokage Infinity World...");
+    console.clear();
+
+console.log(
+    `%c${ENGINE.name}`,
+    "font-size:22px;font-weight:bold;color:#4da6ff;"
+);
+
+console.log(`Version : ${ENGINE.version}`);
+console.log(`Codename: ${ENGINE.codename}`);
+console.log(`Author   : ${ENGINE.author}`);
+console.log("----------------------------");
+console.log("Starting Engine...");
 
     /* ---------- Core ---------- */
 
